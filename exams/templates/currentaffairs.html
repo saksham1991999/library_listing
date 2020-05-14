@@ -1,0 +1,80 @@
+{% extends 'new_base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+
+<!-- Wrapper -->
+<div id="wrapper" class="mm-page mm-slideout">
+
+
+
+<!-- Titlebar
+================================================== -->
+<div class="parallax titlebar"
+	data-background="{% static 'images/news.jpg' %}"
+	data-color="#333333"
+	data-color-opacity="0.7"
+	data-img-width="800"
+	data-img-height="505">
+<div id="titlebar">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+
+				<h2>Current Affairs</h2>
+				<span>Keep up to date with the latest news</span>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Featured -->
+    <div class="container">
+        <div class="row">
+            <!-- Carousel -->
+            <div class="col-md-12">
+                <div class="carousel">
+
+                {% for currentaffair in currentaffairs %}
+                    <!-- Listing Item -->
+                    <div class="carousel-item">
+                        <div class="listing-item compact">
+
+                            <a href="{{ currentaffair.file.url }}" class="listing-img-container">
+
+                                <div class="listing-badges">
+                                    <span class="featured">{{ currentaffair.month }}</span>
+                                    <span>{{ currentaffair.year }}</span>
+                                </div>
+
+                                <div class="listing-img-content">
+                                    <span class="listing-compact-title">{{ currentaffair.title }}</span>
+
+                                    <ul class="listing-hidden-content">
+                                        <h3 style="text-align: center; color: white">Download</h3>
+                                    </ul>
+                                </div>
+
+                                <img src="{{ currentaffair.image.url }}" alt="">
+                            </a>
+
+                        </div>
+                    </div>
+                    <!-- Listing Item / End -->
+
+                {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Featured / End -->
+
+</div>
+<!-- Wrapper / End -->
+
+<div id="mm-blocker" class="mm-slideout"></div>
+{% endblock content %}

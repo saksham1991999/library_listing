@@ -1,0 +1,19 @@
+{% load leaflet_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+
+{% leaflet_js plugins="forms" %}
+{% leaflet_css plugins="forms" %}
+<form>
+    {{ libraryform }}
+</form>
+
+</body>
+</html>

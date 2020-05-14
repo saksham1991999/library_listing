@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load library_template_tag %}
+{% load widget_tweaks %}
+{% block content %}
+<!-- Wrapper -->
+    <!-- Leaflet css and js-->
+
+               <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+       integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+       crossorigin=""/>
+
+<style>
+ #mapid{ height: 500px; width: 100%}
+</style>
+
+    <!--END -->
+
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+
+
+    <style>
+    .txt-center {
+      text-align: center;
+    }
+    .hide {
+      display: none;
+    }
+
+    .clear {
+      float: none;
+      clear: both;
+    }
+
+    .rating {
+        width: 200px;
+        unicode-bidi: bidi-override;
+        direction: rtl;
+        text-align: center;
+        position: relative;
+    }
+
+    .rating > label {
+        float: right;
+        display: inline;
+        padding: 0;
+        margin-bottom: 20px;
+        position: relative;
+        font-size: 22px;
+        width: 1.8em;
+        cursor: pointer;
+        color: #000;
+
+    }
+
+    .rating > label:hover,
+    .rating > label:hover ~ label,
+    .rating > input.radio-btn:checked ~ label {
+        color: transparent;
+    }
+
+    .rating > label:hover:before,
+    .rating > label:hover ~ label:before,
+    .rating > input.radio-btn:checked ~ label:before,
+    .rating > input.radio-btn:checked ~ label:before {
+        content: "\2605";
+        position: absolute;
+        left: 0;
+        color: #FFD700;
+    }
+</style>
+
+
+<div id="wrapper" class="mm-page mm-slideout">
+
+<!-- Titlebar
+================================================== -->
+<div id="titlebar" class="property-titlebar margin-bottom-0">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+
+				<a href="{% url 'core:libraries' %}" class="back-to-listings"></a>
+				<div class="property-title">
+					<h2>{{ library.name }} <span class="property-badge">Library</span></h2>
+					<span>
+						<a href="#location" class="listing-address">
+							<i class="fa fa-map-marker"></i>
+							{{ library.addr1 }}, {{ library.addr2 }}
+						</a>
+					</span>
+				</div>
+
+
+
+
+				<div class="property-pricing">
+                    {%  if library.min_monthly_charges %}
+					<div class="property-price">Rs {{ library.min_monthly_charges }}</div>
+                    {% endif %}
+
+
+					<div class="sub-price">{% if library.min_price_range %}Rs {{ library.min_price_range }}{% endif %} {% if library.max_price_range %} - Rs{{ library.max_price_range }}{% endif %}</div>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Content
+================================================== -->
+
+<div class="container">
+	<div class="row margin-bottom-50">
+		<div class="col-md-12">
+
+
+       	<!-- Slider -->
+			<div class="property-slider default">
+				{% for image in library.get_images %}
+                    <a href="{{ image.image.url }}" data-background-image="{{ image.image.url }}" class="item mfp-gallery"></a>
+
+			    {% endfor %}
+            </div>
+
+			<!-- Slider Thumbs -->
+			<div class="property-slider-nav">
+				{% for image in library.get_images %}
+	    			<div class="item"><img src="{{ image.image.url }}" alt=""></div>
+    	        {% endfor %}
+            </div>
+
+
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="container">
+	<div class="row">
+
+		<!-- library Description -->
+		<div class="col-lg-8 col-md-7 sp-content">
+			<div class="property-description">
+
+				<!-- Main Features -->
+				<ul class="property-main-features">
+					<li>City <span>{{ library.city }}</span></li>
+					<li>State <span>{{ library.state }}</span></li>
+					<li>Pincode <span>{{ library.pincode }}</span></li>
+					<li>No of Seats <span>{{ library.no_of_seats }}</span></li>
+                    <li>Rating <span id=stars></span></li>
+
+				</ul>
+
+
+				<!-- Description -->
+				<h3 class="desc-headline">Description</h3>
+				<div class="show-more">
+					<p>
+						{{ library.library_description }}
+                        {% for image in library.get_images %}
+                            {{ image.url }}
+                        {% endfor %}
+                        {% for image in library.library_images_set.all %}
+                            {{ image }}
+                        {% endfor %}
+					</p>
+
+					<a href="#" class="show-more-button">Show More <i class="fa fa-angle-down"></i></a>
+				</div>
+
+				<!-- Details -->
+				<h3 class="desc-headline">Details</h3>
+				<ul class="property-features margin-top-0">
+					<li>Address Line 1: <span>{{ library.addr1 }}</span></li>
+					<li>Address Line 2: <span>{{ library.addr2 }}</span></li>
+					<li>City: <span>{{ library.city }}</span></li>
+					<li>No of Seats: <span>{{ library.no_of_seats }}</span></li>
+					<li>Opening Time: <span>{{ library.opening_time }}</span></li>
+					<li>Closing Time: <span>{{ library.closing_time }}</span></li>
+				</ul>
+
+
+				<!-- Features -->
+				<h3 class="desc-headline">Amentities</h3>
+				<ul class="property-features checkboxes margin-top-0">
+                    {% for amenity in library.ammenities.all %}
+					<li>{{ amenity.title }}</li>
+                    {% endfor %}
+				</ul>
+
+                <!-- Payment Methods -->
+				<h3 class="desc-headline">Payment Methods</h3>
+				<ul class="property-features checkboxes margin-top-0">
+                    {% for method in library.payment_methods.all %}
+					<li>{{ method.title }}</li>
+                    {% endfor %}
+				</ul>
+
+
+                {% if library.library_videos_set.first %}
+				<!-- Video -->
+				<h3 class="desc-headline no-border">Video</h3>
+				<div class="responsive-iframe">
+					<iframe width="560" height="315" src="{{ library.library_videos_set.first.url }}" frameborder="0" allowfullscreen=""></iframe>
+				</div>
+                {% endif %}
+
+
+				<!-- Location -->
+
+<div class="col-md-12">
+
+				<h3 class="desc-headline no-border" id="location">Location</h3>
+				<div class="divider">
+                    <div id="mapid"></div>
+				</div>
+</div>
+
+
+            <section class="comments">
+			<h4 class="headline margin-bottom-35">Reviews <span class="comments-amount"></span></h4>
+
+				<ul>
+                    <li>
+						<div class="avatar"><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="" /> </div>
+						<div class="comment-content"><div class="arrow-comment"></div>
+							<div class="comment-by">John Doe<span class="date">15th, May 2015 </span>
+							</div>
+
+                            <b>Rating</b> <span id=stars></span>
+							<p>Very good library. {{ library.location.lat }}{{ library.location }}{{ library.location.x }}</p>
+						</div>
+
+					</li>
+				 </ul>
+
+			</section>
+
+
+
+
+                <h3 class="desc-headline">Add Review</h3>
+
+                <form id="add-review" class="add-review">
+				<fieldset>
+
+                    <div class="col-md-12">
+                        <label>Rating: <span>*</span></label>
+				<div class="rating">
+                    <input id="star5" name="star" type="radio" value="5" class="radio-btn hide" />
+                    <label for="star5" >☆</label>
+                    <input id="star4" name="star" type="radio" value="4" class="radio-btn hide" />
+                    <label for="star4" >☆</label>
+                    <input id="star3" name="star" type="radio" value="3" class="radio-btn hide" />
+                    <label for="star3" >☆</label>
+                    <input id="star2" name="star" type="radio" value="2" class="radio-btn hide" />
+                    <label for="star2" >☆</label>
+                    <input id="star1" name="star" type="radio" value="1" class="radio-btn hide" />
+                    <label for="star1" >☆</label>
+                    <div class="clear"></div>
+
+                </div>
+                    </div>
+
+					<div class="col-md-12">
+						<label>Comment: <span>*</span></label>
+						<textarea cols="40" rows="3"></textarea>
+					</div>
+
+				</fieldset>
+
+                    <div class="col-md-12">
+				<a href="#" class="button">Add Review</a>
+                    </div>
+				<div class="clearfix"></div>
+				<div class="margin-bottom-20"></div>
+
+			</form>
+
+
+           </div>
+		</div>
+		<!-- library Description / End -->
+
+
+		<!-- Sidebar -->
+		<div class="col-lg-4 col-md-5 sp-sidebar">
+			<div class="sidebar sticky right">
+
+				<!-- Widget -->
+				<div class="widget margin-bottom-30">
+                    {% if request.user|added_to_bookmark:library.id  %}
+                    <a href="{% url 'core:removefrombookmarks' library.id %}" class="button medium"><i class="fas fa-star"></i></a>
+                    {% else %}
+                    <a href="{% url 'core:addtobookmarks' library.id %}" class="button medium border"><i class="far fa-star"></i></a>
+                    {% endif %}
+
+                    {% if request.session.compare|added_to_compare:library.id  %}
+                    <a href="{% url 'core:removefromcompare' library.id %}" class="button medium">Remove from Compare List</a>
+                    {% else %}
+                    <a href="{% url 'core:addtocompare' library.id %}" class="button medium border"><i class="icon-compare">Compare</i></a>
+                    {% endif %}
+                </div>
+
+
+
+                    <div class="clearfix"></div>
+				</div>
+				<!-- Widget / End -->
+
+
+
+				<!-- Widget -->
+				<div class="widget">
+
+					<!-- Enquiry Widget -->
+					<div class="agent-widget">
+						<div class="agent-title">
+							<div class="agent-photo"><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt=""></div>
+							<div class="agent-details">
+								<h4><a href="#">{{ library.owner_fname }} {{ library.owner_lname }}</a></h4>
+								<span><i class="sl sl-icon-call-in"></i>(123) 123-456</span>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+
+                        <form method="POST" role="form">
+                            {% csrf_token %}
+
+                            {% render_field enquiryform.name  placeholder=enquiryform.name.label %}
+                            {{ enquiryform.name.errors }}
+
+                            {% render_field enquiryform.email  placeholder=enquiryform.email.label %}
+                            {{ enquiryform.email.errors }}
+
+                            {% render_field enquiryform.contact_no  placeholder=enquiryform.contact_no.label %}
+                            {{ enquiryform.contact_no.errors }}
+
+                            {% render_field enquiryform.preferred_joining_date type="date" id="datepicker-12" placeholder=enquiryform.preferred_joining_date.label %}
+                            {{ enquiryform.preferred_joining_date.errors }}
+
+                            {% render_field enquiryform.preferred_time_slot  placeholder=enquiryform.preferred_time_slot.label %}
+                            {{ enquiryform.preferred_time_slot.errors }}
+
+                            {% render_field enquiryform.remarks  placeholder=enquiryform.remarks.label rows='4' %}
+                            {{ enquiryform.remarks.errors }}
+
+						<button class="button fullwidth margin-top-5" type="submit">Send Enquiry</button>
+					    </form>
+                    </div>
+					<!-- Agent Widget / End -->
+
+
+				</div>
+				<!-- Widget / End -->
+
+			</div>
+		</div>
+		<!-- Sidebar / End -->
+
+	</div>
+</div>
+    <div style="margin-bottom: 100px"></div>
+
+
+
+   <script src="js/jquery.min.js"></script> <!-- map scripts --> <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+           integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+           crossorigin=""></script>
+    <script>
+    var lat = {{ library.location.y }};
+    var long = {{ library.location.x }};
+var map = L.map('mapid', {
+    minZoom: 0,
+    maxZoom: 15
+});
+
+var cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
+
+var positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: cartodbAttribution
+}).addTo(map);
+
+map.setView([lat, long], 12);
+
+var marker = L.marker([lat,long]).addTo(map);
+       </script>
+
+
+
+
+<!-- Replacing dropdown placeholder with selected time slot -->
+<script>
+$(".time-slot").each(function() {
+	var timeSlot = $(this);
+	$(this).find('input').on('change',function() {
+		var timeSlotVal = timeSlot.find('strong').text();
+
+		$('.panel-dropdown.time-slots-dropdown a').html(timeSlotVal);
+		$('.panel-dropdown').removeClass('active');
+	});
+});
+</script>
+
+      <script>
+
+      var a= {{ library.get_rating }};
+    document.getElementById("stars").innerHTML = getStars(a);
+
+function getStars(rating) {
+
+  // Round to nearest half
+  rating = Math.round(rating * 2) / 2;
+  let output = [];
+
+  // Append all the filled whole stars
+  for (var i = rating; i >= 1; i--)
+    output.push('<i class="fa fa-star" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  // If there is a half a star, append it
+  if (i == .5) output.push('<i class="fa fa-star-half-o" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  // Fill the empty stars
+  for (let i = (5 - rating); i >= 1; i--)
+    output.push('<i class="fa fa-star-o" aria-hidden="true" style="color: gold;"></i>&nbsp;');
+
+  return output.join('');
+
+}
+
+    </script>
+
+
+
+
+
+    <script>
+$(function() {
+  $('input[name="birthday"]').daterangepicker({
+    singleDatePicker: true,
+    showDropdowns: true,
+    minYear: 1901,
+    maxYear: parseInt(moment().format('YYYY'),10)
+  },
+  );
+});
+</script>
+
+</div>
+<!-- Wrapper / End -->
+
+
+
+
+
+
+<div class="daterangepicker ltr single auto-apply opensleft"><div class="ranges"></div><div class="drp-calendar left single" style="display: block;"><div class="calendar-table"></div><div class="calendar-time" style="display: none;"></div></div><div class="drp-calendar right" style="display: none;"><div class="calendar-table"></div><div class="calendar-time" style="display: none;"></div></div><div class="drp-buttons"><span class="drp-selected"></span><button class="cancelBtn btn btn-sm btn-default" type="button">Cancel</button><button class="applyBtn btn btn-sm btn-primary" disabled="disabled" type="button">Apply</button> </div></div><div id="mm-blocker" class="mm-slideout"></div></body>
+
+
+
+
+
+
+
+{% endblock content %}

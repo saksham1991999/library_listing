@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <style>
+.tip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 5px dotted black;
+}
+
+.tip .data-tip-content {
+  visibility: hidden;
+  width: 300px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 15px;
+  padding: 5px 0;
+    line-height: 20px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tip:hover .data-tip-content {
+  visibility: visible;
+}
+</style>
+
+
+<style>
+
+#map {
+    height: 300px;
+    position: relative;
+    padding-top: 20px;
+}
+</style>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.3/jquery.timepicker.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.3/jquery.timepicker.min.js"></script>
+
+
+<!-- Titlebar
+================================================== -->
+<div id="titlebar" class="submit-page">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h2><i class="fa fa-plus-circle"></i> Publish Library</h2>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Content
+================================================== -->
+<div class="container">
+<div class="row">
+
+	<!-- Submit Page -->
+	<div class="col-md-12">
+		<div class="submit-page">
+           <h3> Basic Information </h3>
+
+		<!-- Section -->
+          <div class="submit-section">
+              <!-- Title -->
+			<div class="form">
+				<h5>Library Name</h5>
+                {% render_field form.name class="search-field" placeholder="Library Name" type="text" %}
+			</div>
+
+			<!-- Row -->
+			<div class="row with-forms">
+
+				<!-- Status -->
+				<div class="col-md-3">
+					<h5>First Name</h5>
+                    {% render_field form.owner_fname class="search-field" placeholder="First Name" type="text" %}
+				</div>
+
+                <div class="col-md-3">
+					<h5>Last Name</h5>
+                    {% render_field form.owner_lname class="search-field" placeholder="Last Name" type="text" %}
+				</div>
+
+                <div class="col-md-6">
+					<h5>Email ID</h5>
+                    {% render_field form.email class="search-field" type="email" placeholder="Email" %}
+				</div>
+
+                <div class="col-md-4">
+					<h5>Phone</h5>
+                    {% render_field form.mobile_no class="search-field" type="tel" placeholder="Mobile Number" %}
+				</div>
+
+				<div class="col-md-4">
+					<h5>Landline</h5>
+                    {% render_field form.landline class="search-field" type="tel" placeholder="Landline" %}
+				</div>
+
+                <div class="col-md-4">
+					<h5>Main Image <span>(Of Library)</span></h5>
+                    {% render_field form.main_image id="main-image" type="file" accept="image/gif, image/jpeg, image/png" %}
+                </div>
+
+                <div class="col-md-12">
+                    <h5>Website   <span>(optional)</span></h5>
+                    {% render_field form.website class="search-field" id="website" type="url" placeholder="Website URL" %}
+                </div>
+
+                <div class="col-md-12">
+                    <h5>Library Images</h5>
+                    {% render_field imagesform.image class="dropzone" id="website" %}
+                </div>
+
+
+
+			</div>
+			<!-- Row / End -->
+
+		</div>
+		<!-- Section / End -->
+
+
+		<!-- Section -->
+            <h3>Location<i class="tip"> <span class="data-tip-content"> Add the location of your library</span></i></h3>
+		<div class="submit-section">
+
+			<!-- Row -->
+			<div class="row with-forms">
+
+				<!-- Address -->
+				<div class="col-md-12">
+					<h5> Address 1</h5>
+                    {% render_field form.addr1 type="text" %}
+                    <h5> Address 2</h5>
+                    {% render_field form.addr2 type="text" %}
+				</div>
+
+				<!-- City -->
+				<div class="col-md-4">
+					<h5>City</h5>
+                    {% render_field form.city type="text" placeholder="City" %}
+				</div>
+
+				<!-- City -->
+				<div class="col-md-4">
+					<h5>State</h5>
+                    {% render_field form.state type="text" placeholder="State" %}
+				</div>
+
+				<!-- Zip-Code -->
+				<div class="col-md-4">
+					<h5>PIN Code</h5>
+                    {% render_field form.pincode id="zip" name="zip" type="text" pattern="[0-9]*" placeholder="PIN" %}
+				</div>
+
+                <div class="col-md-5">
+                    <h5>Latitude</h5>
+                    <input type="number" step="any" id="latitude" placeholder="Latitude" />
+                </div>
+
+                <div class="col-md-5">
+                    <h5>Longitude</h5>
+                    <input type="number" step="any" id="longitude" placeholder="Longitude" />
+                </div>
+
+                <div class="col-md-2" style="padding-top: 40px">
+                    <input style="line-height: 20px" type="button" value="Jump" onClick="updateLatLng(document.getElementById('latitude').value,document.getElementById('longitude').value,1)">
+                </div>
+
+                <div class="divider" style="padding-top: 20px;">
+                <div id="map"></div>
+                    <h5>Or, click on your location in the map</h5>
+                </div>
+
+
+			</div>
+			<!-- Row / End -->
+
+		</div>
+		<!-- Section / End -->
+
+
+		<!-- Section -->
+		<h3>Detailed Information</h3>
+		<div class="submit-section">
+
+			<!-- Description -->
+			<div class="form">
+				<h5>Description</h5>
+                {% render_field form.library_description class="WYSIWYG" name="summary" cols="40" rows="3" id="summary" spellcheck="true" %}
+			</div>
+
+
+            <div class="row with-forms">
+               <div class="col-md-4">
+                   <h5>Number Of Seats<i class="tip"><span class="data-tip-content">Add the number of seats in your library</span></i></h5>
+                   {% render_field form.state id="seats" type="number" placeholder="Seats" %}
+                </div>
+                <div class="col-md-4">
+                    <h5>Opening Time<i class="tip"><span class="data-tip-content">Opening time of your library</span></i></h5>
+                    {% render_field form.opening_time type="text" id="openingtime" class="from-control" placeholder="Hr:Min" %}
+                </div>
+               <div class="col-md-4">
+                   <h5>Closing Time<i class="tip"><span class="data-tip-content">Closing time of your library</span></i></h5>
+                   {% render_field form.closing_time type="text" id="closingtime" class="from-control" placeholder="Hr:Min" %}
+                </div>
+
+               <div class="col-md-3">
+                   <h5>One Time Charges</h5>
+                  {% render_field form.closing_time id="non-ref-charges" type="number" placeholder="Rs. " %}
+               </div>
+		       <div class="col-md-3">
+                   <h5>Refund Policy</h5>
+                   {% render_field form.refund_policy  %}
+               </div>
+               <div class="col-md-3">
+                   <h5>Min Price Range</h5>
+                   {% render_field form.min_price_range id="min-range" type="number" placeholder="Rs. " %}
+               </div>
+               <div class="col-md-3">
+                   <h5>Max Price Range</h5>
+                   {% render_field form.max_price_range id="max-range" type="number" placeholder="Rs. " %}
+               </div>
+        </div>
+
+			<!-- Checkboxes -->
+			<h5 class="margin-top-30">Amenities</h5>
+			<div class="checkboxes in-row margin-bottom-20">
+
+				<input id="check-2" type="checkbox" name="check">
+				<label for="check-2">Air Conditioning</label>
+
+				<input id="check-3" type="checkbox" name="check">
+				<label for="check-3">Cafe</label>
+
+				<input id="check-4" type="checkbox" name="check" >
+				<label for="check-4">WiFi</label>
+
+			</div>
+
+            <h5 class="margin-top-30">Payment Methods</h5>
+			<div class="checkboxes in-row margin-bottom-20">
+
+				<input id="check-5" type="checkbox" name="check">
+				<label for="check-5">Paytm</label>
+
+				<input id="check-6" type="checkbox" name="check">
+				<label for="check-6">Cash</label>
+
+				<input id="check-7" type="checkbox" name="check" >
+				<label for="check-7">Credit/Debit Card</label>
+
+                <input id="check-8" type="checkbox" name="check" >
+				<label for="check-8">UPI</label>
+
+			</div>
+			<!-- Checkboxes / End -->
+
+
+            <h5 class="margin-top-30">Opening Days</h5>
+            <div class="checkboxes in-row margin-bottom-20">
+            {% for day in openingdays %}
+
+           <input type="checkbox" name="opening days" id="option{{day.id}}" value={{day.name}} />
+           <label for="option{{day.id}}"><b>{{day.name}}</b></label><br />
+
+            {% endfor %}
+            </div>
+
+
+        </div>
+        <h3>Social Media</h3>
+            <div class="submit-section">
+                <div class="col-md-4">
+                    <h5>Facebook</h5>
+                    {% render_field form.fb_url id="fb" type="url" placeholder="Facebook URL" %}
+                </div>
+
+                <div class="col-md-4">
+                    <h5>Instagram</h5>
+                    {% render_field form.insta id="fb" type="url" placeholder="Instagram URL" %}
+                </div>
+
+                <div class="col-md-4">
+                    <h5>Google Map<i class="tip"><span class="data-tip-content"> Google Maps link of your library"</span></i></h5>
+                    {% render_field form.google_map id="fb" type="url" placeholder="Google Maps URL" %}
+                </div>
+
+            </div>
+
+            <button type="submit"> Publish Library</button>
+        <br><br><br>
+
+
+</div>
+
+
+
+  </div>
+</div>
+
+		</div>
+		<!-- Section / End -->
+
+        {% comment %}
+		<!-- Section -->
+		<h3>Contact Details</h3>
+		<div class="submit-section">
+
+			<!-- Row -->
+			<div class="row with-forms">
+
+				<!-- Name -->
+				<div class="col-md-4">
+					<h5>Name</h5>
+					<input type="text">
+				</div>
+
+				<!-- Email -->
+				<div class="col-md-4">
+					<h5>E-Mail</h5>
+					<input type="text">
+				</div>
+
+				<!-- Name -->
+				<div class="col-md-4">
+					<h5>Phone <span>(optional)</span></h5>
+					<input type="text">
+				</div>
+
+			</div>
+			<!-- Row / End -->
+
+		</div>
+		<!-- Section / End -->
+		 {% endcomment %}
+
+
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+            <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script> <!-- Orginal: http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js -->
+<script>
+var tileLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> Contributors'
+});
+//remember last position
+var rememberLat = document.getElementById('latitude').value;
+var rememberLong = document.getElementById('longitude').value;
+if( !rememberLat || !rememberLong ) { rememberLat = 28.6; rememberLong = 77.25;}
+var map = new L.Map('map', {
+'center': [rememberLat, rememberLong],
+'zoom': 11,
+'layers': [tileLayer]
+});
+var marker = L.marker([rememberLat, rememberLong],{
+draggable: true
+}).addTo(map);
+marker.on('dragend', function (e) {
+updateLatLng(marker.getLatLng().lat, marker.getLatLng().lng);
+});
+map.on('click', function (e) {
+marker.setLatLng(e.latlng);
+updateLatLng(marker.getLatLng().lat, marker.getLatLng().lng);
+});
+function updateLatLng(lat,lng,reverse) {
+if(reverse) {
+marker.setLatLng([lat,lng]);
+map.panTo([lat,lng]);
+} else {
+document.getElementById('latitude').value = marker.getLatLng().lat;
+document.getElementById('longitude').value = marker.getLatLng().lng;
+map.panTo([lat,lng]);
+}
+}
+</script>
+<script type="text/javascript">
+    $( "#openingtime" ).timepicker();
+    $("#closingtime").timepicker();
+</script>
+
+
+	</div>
+
+</div>
+</div>
+</div>
+
+
+
+    <script>
+
+
+
+    </script>
+{% endblock content %}

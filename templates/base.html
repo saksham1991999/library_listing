@@ -1,0 +1,80 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Library Listing</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+    
+    <!-- Favicon -->   
+    <link href="{% static 'images/logo.png' %}" rel="shortcut icon"/>
+
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/color.css'%}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/icons.css'%}">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+
+	{% block extra_stylesheet %}
+	{% endblock extra_stylesheet %}
+
+</head>
+
+
+<body>
+    {% comment %}
+    <div style="display:none">
+        <img src="{% google_analytics %}" width="0" height="0" />
+    </div>
+    {% endcomment %}
+    <div id="wrapper" class="mm-page mm-slideout">
+	{% include "navbar.html" %}
+
+
+    <!-- Messages -->   
+	{% if messages %}
+	<div class="">
+        {% for message in messages %}
+
+            <div class="notification {{ message.tags }} closeable">
+				<p>{{ message }}</p>
+				<a class="close"></a>
+			</div>
+
+        {% endfor %}
+    </div>
+	{% endif %}
+    <!-- EndMessages --> 
+
+
+    <!-- Wrapper -->
+
+    {% block content %}
+    {% endblock content %}
+
+    {% block extra_body %}
+    {% endblock extra_body %}
+  
+    {% include "footer.html" %}
+
+    <!-- Back To Top Button -->
+    <div id="backtotop"><a href="#"></a></div>
+
+    </div>
+    <!-- Wrapper -->
+    {% include "scripts.html" %}
+  
+    {% block extra_scripts %}
+    {% endblock extra_scripts %}
+</body>
+</html>

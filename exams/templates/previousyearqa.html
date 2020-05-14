@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+    <!-- Wrapper -->
+<div id="wrapper" class="mm-page mm-slideout">
+
+
+<!-- Titlebar
+================================================== -->
+<div class="parallax titlebar"
+	data-background="{% static 'images/exam.jpg' %}"
+	data-color="#333333"
+	data-color-opacity="0.7"
+	data-img-width="800"
+	data-img-height="505">
+<div id="titlebar">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+
+				<h2>Previous Year Questions/Answers</h2>
+
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+
+
+<!-- Content
+================================================== -->
+<div class="container" style="margin-bottom: 50px">
+	<div class="row">
+		<div class="col-md-12">
+
+			<!-- Compare List -->
+			<div class="compare-list-container">
+
+				<ul id="compare-list">
+
+					<li>
+                        <div>Title</div>
+						<div>Set</div>
+						<div>Year</div>
+						<div>Question Paper</div>
+						<div>Answers</div>
+					</li>
+
+                    {% for file in files %}
+					<li>
+						<div>{{ file.exam_title }}</div>
+						<div>{{ file.set }}</div>
+						<div>{{ file.year }}</div>
+						<div><a  href="{{ file.questions.url }}" download> Download</a></div>
+                        <div><a  href="{{ file.answers.url }}" download> Download</a></div>
+					</li>
+                    {% endfor %}
+
+				</ul>
+			</div>
+			<!-- Compare List / End -->
+
+		</div>
+	</div>
+</div>
+
+
+</div>
+<!-- Wrapper / End -->
+
+
+
+<div id="mm-blocker" class="mm-slideout"></div>
+
+{% endblock content %}
