@@ -78,8 +78,8 @@ python-dateutil==2.8.1
 python-decouple==3.1
 python3-openid==3.1.0
 pytz==2018.5
-pywin32==227
-pywinpty==0.5.7
+
+
 pyzmq==18.1.1
 qtconsole==4.6.0
 requests==2.21.0
@@ -104,3 +104,5 @@ whitenoise==5.0
 widgetsnbextension==3.5.1
 wrapt==1.11.2
 zipp==2.1.0
+
+geopandas

@@ -114,7 +114,7 @@ def LibrariesView(request):
     search_term = ''
     city = ''
 
-    ref_location = GEOSGeometry('SRID=4326;POINT(77.03922300000001 28.45692)')
+    # ref_location = GEOSGeometry('SRID=4326;POINT(77.03922300000001 28.45692)')
 
 
     for i in range(10):
@@ -134,14 +134,18 @@ def LibrariesView(request):
         allLibraries = allLibraries.filter(name__icontains=search_term)
 
 
-
     if 'latitude' in request.GET and 'longitude' in request.GET:
         latitude = request.GET['latitude']
         longitude = request.GET['longitude']
-        ref_location = GEOSGeometry('SRID=4326;POINT('+str(latitude)+' ' + str(longitude) +')')
+        request.session['latitude'] = latitude
+        request.session['longitude'] = longitude
 
-    allLibraries = models.library.objects.annotate(distance=Distance("location", ref_location)).order_by('distance')[
-                   0:6]
+    if 'latitude' in request.session and 'longitude' in request.session:
+        latitude = request.session['latitude']
+        longitude = request.session['longitude']
+        ref_location = GEOSGeometry('SRID=4326;POINT('+str(longitude)+' ' + str(latitude) +')')
+        allLibraries = allLibraries.annotate(distance=Distance("location", ref_location)).order_by('distance')[0:6]
+
     paginator = Paginator(allLibraries, 25)
     page = request.GET.get('page')
     allLibraries = paginator.get_page(page)
@@ -185,40 +189,56 @@ def LibraryView(request, id):
     library.views = int(library.views + 1)
     library.save()
     images = models.library_images.objects.filter(library=library)
-    ammenities = library.ammenities.all()
-    payment_methods = library.payment_methods.all()
+
 
     if request.method == 'POST':
-        form = forms.EnquiryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request,
-                'Enquiry sent Successfully',
-                extra_tags='alert alert-success alert-dismissible fade show'
-            )
-            return redirect('core:library', id)
+        print(request.POST)
+        type = request.POST['type']
+        print(type)
+        if type == 'enquiry':
+            form = forms.EnquiryForm(request.POST)
+            print('Enquiry')
+            print(form.errors)
+            if form.is_valid():
+                form.save()
+                email_message = 'Thanks for your enquiry, we redirected your queries to concerned library owners to provide you best possible solution. %0A In case for quick response please feel free to reach Library owner direct business contact number' + str(library.mobile_no) + '& email id ' + str(library.email) + '.%0A In case, if you find any difficulties please feel free to reach out to us Phone: 9818896523 and Email Id: info@librarynearby.com.%0A Thanks,%0A Librarynearby.com'
+                # send_mail(
+                #     'Library Inquiry',
+                #     str(email_message),
+                #     'saksham1991999@gmail.com',
+                #     [str(form.cleaned_data['email'])],
+                #     fail_silently=True,
+                # )
+                messages.success(
+                    request,
+                    'Enquiry sent Successfully',
+                    extra_tags='alert alert-success alert-dismissible fade show'
+                )
+                return redirect('core:library', id)
+        elif type == 'rating':
+            form = forms.RatingsForm(request.POST)
+            if form.is_valid():
+                new_form = form.save(commit=False)
+                new_form.library = library
+                new_form.user = request.user
+                new_form.save()
+                messages.success(
+                    request,
+                    'Review added Successfully',
+                    extra_tags='alert alert-success alert-dismissible fade show'
+                )
+                return redirect('core:library', id)
         else:
             return redirect('core:library', id)
-
     else:
         enquiryform = forms.EnquiryForm()
+        rating_form = forms.RatingsForm()
         context = {
             'library': library,
             'images': images,
-            'ammenties': ammenities,
-            'payment_methods':payment_methods,
             'enquiryform': enquiryform,
-
+            'rating_form': rating_form,
         }
-        # if request.user.is_authenticated():
-        # bookmarkedlibraries = models.bookmark.objects.filter(user=request.user)[0]
-        # bookmarkedlibraries = bookmarkedlibraries.libraries
-        #
-        # comparinglibraries = models.comparison.objects.filter(user=request.user)[0]
-        # comparinglibraries = comparinglibraries.libraries
-        # context['bookmarkedlibraries'] = bookmarkedlibraries
-        # context['comparinglibraries'] = comparinglibraries
         return render(request, 'library.html', context)
 
 def BugReportView(request):
@@ -342,22 +362,24 @@ def editLibrary(request, id):
 def addLibrary(request):
     # user = models.User.objects.get(email = request.user.email)
     if request.method == "POST":
-        print(request)
+        print(request.POST)
         form = forms.LibraryForm(request.POST, request.FILES)
 
-        imagesform = forms.ImagesForm(request.POST, request.FILES)
-        uploadedimages = request.FILES.getlist('image')
-        print(imagesform)
-
-        longitude = 77.03179
-        latitude = 25.470804
-        lib_location = Point(longitude, latitude)
+        longitude1 = request.POST['longitude']
+        latitude1 = request.POST['latitude']
+        print(longitude1, latitude1)
+        lib_location1 = GEOSGeometry('SRID=4326;POINT(' + str(longitude1) + ' ' + str(latitude1) + ')')
+        print(lib_location1)
         print(form.errors)
         if form.is_valid():
             new_form = form.save(commit = False)
             new_form.owner = request.user
-            new_form.location = lib_location
+            new_form.location = lib_location1
             new_form.save()
+            form.save_m2m()
+
+            imagesform = forms.ImagesForm(request.POST, request.FILES)
+            uploadedimages = request.FILES.getlist('image')
 
             if imagesform.is_valid():
                 for image in uploadedimages:
@@ -366,16 +388,29 @@ def addLibrary(request):
 
             messages.success(
                             request,
-                            'Library Added Successfully',
+                            'Library Published Successfully, Kindly wait for approval',
                             extra_tags='alert alert-success alert-dismissible fade show'
                             )
             return redirect('core:mylibraries')
+        else:
+            messages.error(
+                request,
+                'Please fill the details correctly and try again',
+                extra_tags='alert alert-error alert-dismissible fade show'
+            )
+            return redirect('core:addlibrary')
 
     form = forms.LibraryForm()
     imagesform = forms.ImagesForm()
+    amenities = models.ammenities.objects.all()
+    payment_methods = models.payment_methods.objects.all()
+    opening_days = models.weekday.objects.all()
     context = {
         'form': form,
         'imagesform': imagesform,
+        'amenities':amenities,
+        'payment_methods':payment_methods,
+        'opening_days':opening_days,
     }
     return render(request, 'dashboard/addlibrary.html', context)
 

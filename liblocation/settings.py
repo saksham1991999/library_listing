@@ -8,7 +8,7 @@ SECRET_KEY = '06!4*24u)dta!_e(s*p!cwxk6(*6n1)o9y*54$mmrr!5_+5=x2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'librarynearby.com', 'www.librarynearby.com']
 
 
 # Application definition
@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.gis',
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,10 +77,10 @@ WSGI_APPLICATION = 'liblocation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'geodjango2',
-        'USER': 'postgres',
+        'NAME': 'librarynearby',
+        'USER': 'saksham',
         'HOST': 'localhost',
-        'PASSWORD': 's2ksh2m19',
+        'PASSWORD': 'saksham123',
         'PORT': '5432',
     }
 }
@@ -123,7 +125,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_in_venv')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 STATICFILES_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -139,7 +141,7 @@ LEAFLET_CONFIG = {
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_USERNAME_REQUIRED = False
 AUTH_USER_MODEL = 'core.User'
 # Auth
@@ -161,5 +163,11 @@ LEAFLET_CONFIG = {
     'MIN_ZOOM':5,
     'SCALE': 'both',
     'ATTRIBUTION_PREFIX': 'Power2Create',
-
 }
+
+
+GOOGLE_ANALYTICS = {
+    'google_analytics_id': '157733287',
+}
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

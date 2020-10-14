@@ -42,7 +42,16 @@
                             <div class="title">
                                 <h4><a href="{% url 'core:library' library.id %}">{{ library.name }}</a></h4>
                                 <span>{{ library.city }} </span>
-                                <span class="table-property-price">Rs {{ library.min_monthly_price }}</span>
+
+                                {% if library.rejected %}
+                                    <span class="table-property-price">Rejected : {{ library.rejection_reason }}</span>
+                                {% else %}
+                                    {% if library.verified %}
+                                    <span class="table-property-price">Approved</span>
+                                    {% else %}
+                                        <span class="table-property-price">Waiting Approval</span>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </td>
                         <td class="expire-date">{{ library.views }}</td>

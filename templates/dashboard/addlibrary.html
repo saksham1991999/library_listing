@@ -59,6 +59,8 @@
 <!-- Content
 ================================================== -->
 <div class="container">
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
 <div class="row">
 
 	<!-- Submit Page -->
@@ -72,6 +74,7 @@
 			<div class="form">
 				<h5>Library Name</h5>
                 {% render_field form.name class="search-field" placeholder="Library Name" type="text" %}
+                {{ form.name.errors }}
 			</div>
 
 			<!-- Row -->
@@ -81,41 +84,49 @@
 				<div class="col-md-3">
 					<h5>First Name</h5>
                     {% render_field form.owner_fname class="search-field" placeholder="First Name" type="text" %}
+                    {{ form.owner_fname.errors }}
 				</div>
 
                 <div class="col-md-3">
 					<h5>Last Name</h5>
                     {% render_field form.owner_lname class="search-field" placeholder="Last Name" type="text" %}
+                    {{ form.owner_lname.errors }}
 				</div>
 
                 <div class="col-md-6">
 					<h5>Email ID</h5>
                     {% render_field form.email class="search-field" type="email" placeholder="Email" %}
+                    {{ form.email.errors }}
 				</div>
 
                 <div class="col-md-4">
 					<h5>Phone</h5>
                     {% render_field form.mobile_no class="search-field" type="tel" placeholder="Mobile Number" %}
+                    {{ form.mobile_no.errors }}
 				</div>
 
 				<div class="col-md-4">
 					<h5>Landline</h5>
                     {% render_field form.landline class="search-field" type="tel" placeholder="Landline" %}
+                    {{ form.landline.errors }}
 				</div>
 
                 <div class="col-md-4">
 					<h5>Main Image <span>(Of Library)</span></h5>
                     {% render_field form.main_image id="main-image" type="file" accept="image/gif, image/jpeg, image/png" %}
+                    {{ form.main_image.errors }}
                 </div>
 
                 <div class="col-md-12">
                     <h5>Website   <span>(optional)</span></h5>
                     {% render_field form.website class="search-field" id="website" type="url" placeholder="Website URL" %}
+                    {{ form.website.errors }}
                 </div>
 
                 <div class="col-md-12">
                     <h5>Library Images</h5>
                     {% render_field imagesform.image class="dropzone" id="website" %}
+                    {{ imagesform.image.errors }}
                 </div>
 
 
@@ -138,36 +149,41 @@
 				<div class="col-md-12">
 					<h5> Address 1</h5>
                     {% render_field form.addr1 type="text" %}
+                    {{ form.addr1.errors }}
                     <h5> Address 2</h5>
                     {% render_field form.addr2 type="text" %}
+                    {{ form.addr2.errors }}
 				</div>
 
 				<!-- City -->
 				<div class="col-md-4">
 					<h5>City</h5>
                     {% render_field form.city type="text" placeholder="City" %}
+                    {{ form.city.errors }}
 				</div>
 
 				<!-- City -->
 				<div class="col-md-4">
 					<h5>State</h5>
                     {% render_field form.state type="text" placeholder="State" %}
+                    {{ form.state.errors }}
 				</div>
 
 				<!-- Zip-Code -->
 				<div class="col-md-4">
 					<h5>PIN Code</h5>
                     {% render_field form.pincode id="zip" name="zip" type="text" pattern="[0-9]*" placeholder="PIN" %}
+                    {{ form.pincode.errors }}
 				</div>
 
                 <div class="col-md-5">
                     <h5>Latitude</h5>
-                    <input type="number" step="any" id="latitude" placeholder="Latitude" />
+                    <input type="number" step="any" id="latitude" placeholder="Latitude" name="latitude" required/>
                 </div>
 
                 <div class="col-md-5">
                     <h5>Longitude</h5>
-                    <input type="number" step="any" id="longitude" placeholder="Longitude" />
+                    <input type="number" step="any" id="longitude" placeholder="Longitude" name="longitude" required/>
                 </div>
 
                 <div class="col-md-2" style="padding-top: 40px">
@@ -194,84 +210,86 @@
 			<!-- Description -->
 			<div class="form">
 				<h5>Description</h5>
-                {% render_field form.library_description class="WYSIWYG" name="summary" cols="40" rows="3" id="summary" spellcheck="true" %}
+                {% render_field form.library_description class="WYSIWYG" name="summary" cols="40" rows="3" id="summary" spellcheck="true" required='' %}
+                {{ form.library_description.errors }}
 			</div>
 
 
             <div class="row with-forms">
                <div class="col-md-4">
                    <h5>Number Of Seats<i class="tip"><span class="data-tip-content">Add the number of seats in your library</span></i></h5>
-                   {% render_field form.state id="seats" type="number" placeholder="Seats" %}
+                   {% render_field form.no_of_seats id="seats" placeholder="Seats" %}
+                   {{ form.no_of_seats.errors }}
                 </div>
                 <div class="col-md-4">
                     <h5>Opening Time<i class="tip"><span class="data-tip-content">Opening time of your library</span></i></h5>
                     {% render_field form.opening_time type="text" id="openingtime" class="from-control" placeholder="Hr:Min" %}
+                    {{ form.opening_time.errors }}
                 </div>
                <div class="col-md-4">
                    <h5>Closing Time<i class="tip"><span class="data-tip-content">Closing time of your library</span></i></h5>
                    {% render_field form.closing_time type="text" id="closingtime" class="from-control" placeholder="Hr:Min" %}
+                   {{ form.closing_time.errors }}
                 </div>
 
                <div class="col-md-3">
                    <h5>One Time Charges</h5>
-                  {% render_field form.closing_time id="non-ref-charges" type="number" placeholder="Rs. " %}
+                  {% render_field form.non_refundable_charges id="non-ref-charges" type="number" placeholder="Rs. " %}
+                   {{ form.non_refundable_charges.errors }}
                </div>
 		       <div class="col-md-3">
                    <h5>Refund Policy</h5>
                    {% render_field form.refund_policy  %}
+                   {{ form.refund_policy.errors }}
                </div>
                <div class="col-md-3">
                    <h5>Min Price Range</h5>
                    {% render_field form.min_price_range id="min-range" type="number" placeholder="Rs. " %}
+                   {{ form.min_price_range.errors }}
                </div>
                <div class="col-md-3">
                    <h5>Max Price Range</h5>
                    {% render_field form.max_price_range id="max-range" type="number" placeholder="Rs. " %}
+                   {{ form.max_price_range.errors }}
                </div>
         </div>
-
+            {% comment %}
+            {% render_field form.ammenities %}
+            {% render_field form.payment_methods %}
+            {% render_field form.opening_days %}
+            {% endcomment %}
 			<!-- Checkboxes -->
 			<h5 class="margin-top-30">Amenities</h5>
 			<div class="checkboxes in-row margin-bottom-20">
 
-				<input id="check-2" type="checkbox" name="check">
-				<label for="check-2">Air Conditioning</label>
-
-				<input id="check-3" type="checkbox" name="check">
-				<label for="check-3">Cafe</label>
-
-				<input id="check-4" type="checkbox" name="check" >
-				<label for="check-4">WiFi</label>
+                {% for amenity in amenities %}
+				<input id="amenities-{{ forloop.counter }}" type="checkbox" name="amenities" value={{ amenity.id }}>
+				<label for="amenities-{{ forloop.counter }}">{{ amenity.title }}</label>
+                {% endfor %}
 
 			</div>
 
             <h5 class="margin-top-30">Payment Methods</h5>
 			<div class="checkboxes in-row margin-bottom-20">
 
-				<input id="check-5" type="checkbox" name="check">
-				<label for="check-5">Paytm</label>
 
-				<input id="check-6" type="checkbox" name="check">
-				<label for="check-6">Cash</label>
-
-				<input id="check-7" type="checkbox" name="check" >
-				<label for="check-7">Credit/Debit Card</label>
-
-                <input id="check-8" type="checkbox" name="check" >
-				<label for="check-8">UPI</label>
-
+                {% for payment_method in payment_methods %}
+				<input id="payment_methods-{{ forloop.counter }}" type="checkbox" name="payment_methods" value={{ payment_method.id }}>
+				<label for="payment_methods-{{ forloop.counter }}">{{ payment_method.title }}</label>
+                {% endfor %}
+                {{ form.payment_methods.erros }}
 			</div>
 			<!-- Checkboxes / End -->
 
 
             <h5 class="margin-top-30">Opening Days</h5>
             <div class="checkboxes in-row margin-bottom-20">
-            {% for day in openingdays %}
 
-           <input type="checkbox" name="opening days" id="option{{day.id}}" value={{day.name}} />
-           <label for="option{{day.id}}"><b>{{day.name}}</b></label><br />
-
+            {% for day in opening_days %}
+               <input  type="checkbox" name="opening_days" id="openings_days-{{day.id}} openings_days" value={{ day.id }} />
+               <label for="openings_days-{{day.id}}">{{day.day}}</label><br />
             {% endfor %}
+            {{ form.opening_days.erros }}
             </div>
 
 
@@ -281,21 +299,23 @@
                 <div class="col-md-4">
                     <h5>Facebook</h5>
                     {% render_field form.fb_url id="fb" type="url" placeholder="Facebook URL" %}
+                    {{ form.fb_url.errors }}
                 </div>
 
                 <div class="col-md-4">
                     <h5>Instagram</h5>
                     {% render_field form.insta id="fb" type="url" placeholder="Instagram URL" %}
+                    {{ form.insta.errors }}
                 </div>
 
                 <div class="col-md-4">
                     <h5>Google Map<i class="tip"><span class="data-tip-content"> Google Maps link of your library"</span></i></h5>
                     {% render_field form.google_map id="fb" type="url" placeholder="Google Maps URL" %}
+                    {{ form.google_map.errors }}
                 </div>
 
             </div>
-
-            <button type="submit"> Publish Library</button>
+            <button class="button fullwidth margin-top-5" type="submit">Publish Library</button>
         <br><br><br>
 
 
@@ -305,8 +325,9 @@
 
   </div>
 </div>
+</form>
+</div>
 
-		</div>
 		<!-- Section / End -->
 
         {% comment %}
@@ -381,23 +402,25 @@ map.panTo([lat,lng]);
 }
 }
 </script>
+
+
 <script type="text/javascript">
-    $( "#openingtime" ).timepicker();
-    $("#closingtime").timepicker();
+    $( "#openingtime" ).timepicker({ timeFormat: 'H:mm:ss' });
+    $("#closingtime").timepicker({ timeFormat: 'H:mm:ss' });
 </script>
 
+<script type="text/javascript">
+$(document).ready(function () {
+    $('#openings_days').click(function() {
+      checked = $("input[type=checkbox]:checked").length;
 
-	</div>
+      if(!checked) {
+        alert("You must check at least one checkbox.");
+        return false;
+      }
 
-</div>
-</div>
-</div>
+    });
+});
 
-
-
-    <script>
-
-
-
-    </script>
+</script>
 {% endblock content %}

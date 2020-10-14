@@ -44,16 +44,12 @@ class UserProfileForm(forms.ModelForm):
 class EnquiryForm(forms.ModelForm):
     class Meta:
         model = models.enquiry
-        fields = '__all__'
-        labels = {
-            'preferred_joining_date': _('Preferred Joining Date (YYYY-MM-DD)'),
-        }
-        widgets = {
-            # 'preferred_joining_date': forms.DateInput(),
-            'contact_no': forms.TextInput(attrs={'pattern':'[0-9]{10}'}),
-            'preferred_joining_date': forms.TextInput(attrs={'pattern': '[2][0][0-9]{2}-[0-9]{2}-[0-9]{2}'}),
+        fields = ['name', 'email', 'contact_no', 'preferred_joining_date', 'preferred_time_slot', 'remarks']
 
-        }
+class RatingsForm(forms.ModelForm):
+    class Meta:
+        model = models.library_ratings
+        fields = ['rating', 'comment']
 
 class BugReportForm(forms.ModelForm):
     class Meta:

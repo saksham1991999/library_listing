@@ -6,7 +6,7 @@
 <style>
 .alert {
   padding: 20px;
-  background-color: mediumblue;
+  background-color: #800080;
   color: white;
     margin-bottom: 30px;
 }
@@ -43,7 +43,7 @@
 			<!-- Form -->
 			<div class="main-search-box no-shadow">
 
-            <form method="get">
+            <form method="get" id="search_form">
 				<!-- Row With Forms -->
 				<div class="row with-forms">
 					<!-- Min Price -->
@@ -96,8 +96,8 @@
 				<!-- Row With Forms / End -->
 
 
-                <input name="latitude" type="number" step="any" value=77.03922300000001 hidden>
-                <input name="longitude" type="number" step="any" value=28.45692 hidden>
+                <input name="latitude" type="hidden" step="any" id="latitude" hidden value="{{ request.session.latitude }}">
+                <input name="longitude" type="hidden" step="any" id="longitude" hidden value="{{ request.session.longitude }}">
 
 				<!-- More Search Options -->
 				<a href="#" class="more-search-options-trigger margin-top-10" data-open-title="More Options" data-close-title="Less Options"></a>
@@ -191,6 +191,7 @@
 						</div>
 
 						<div class="listing-carousel">
+                            <div><img src="{{ image.main_image.url }}" alt=""></div>
                             {% for image in library.get_images %}
                                 <div><img src="{{ image.image.url }}" alt=""></div>
                             {% endfor %}
@@ -217,7 +218,9 @@
 
 						<div class="listing-footer">
 							<a href="#"><i class="fa fa-user"></i> {{ library.owner_fname }} {{ library.owner_lname }}</a>
-                            <span>Rating &nbsp;<span id="stars"></span></span>
+                            {% if library.get_rating %}
+                            <span>Rating &nbsp;<span id="stars-{{ library.id }}"></span></span>
+                                {% endif %}
 						</div>
 					</div>
 				</div>
@@ -227,7 +230,7 @@
             {% empty %}
                 <div class="alert">
                     <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                    <strong>Snap!</strong> Couldn't find any libraries related to your search,but here are our suggestions.
+                    <strong>We regret for inconveniences,</strong> as no more libraries is being listed to your search criteria, please revisit in future for better services at our end. Thanks, P2C
                 </div>
 
                 {% for library in other_libraries %}
@@ -249,6 +252,7 @@
 						</div>
 
 						<div class="listing-carousel">
+                        <div><img src="{{ image.main_image.url }}" alt=""></div>
                             {% for image in library.get_images %}
                                 <div><img src="{{ image.image.url }}" alt=""></div>
                             {% endfor %}
@@ -275,7 +279,9 @@
 
 						<div class="listing-footer">
 							<a href="#"><i class="fa fa-user"></i> {{ library.owner_fname }} {{ library.owner_lname }}</a>
-                            <span>Rating &nbsp;<span id="stars"></span></span>
+                            {% if library.get_rating %}
+                                <span>Rating &nbsp;<span id="stars-{{ library.id }}"></span></span>
+                            {% endif %}
 						</div>
 					</div>
 				</div>
@@ -328,10 +334,64 @@
 
 {% block extra_scripts %}
 
-<script>
-var a= "{{ library.rating }}";
-document.getElementById("stars").innerHTML = getStars(a);
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+{% if not request.session.latitude %}
+    <script>
+$(document).ready( function () {
+    if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+    });
+    function showPosition(position) {
+        $('#latitude').val(position.coords.latitude);
+        $('#longitude').val(position.coords.longitude);
+        $('#search_form').submit();
+    }
+</script>
+    {% endif %}
+
+
+    {% comment %}
+    <script>
+    $(document).ready( function () {
+        if( sessionStorage.getItem("geo_access") === null ){
+            // just assume it is prompt
+            sessionStorage.setItem("geo_access", "prompt");
+        }
+
+        function ask(){
+            navigator.geolocation.getCurrentPosition(function(){
+                sessionStorage.setItem("geo_access", "granted");
+
+            }, function(err){
+                if(err.code == 1){ // PERMISSION_DENIED
+                    sessionStorage.setItem("geo_access", "denied");
+                }
+                sessionStorage.setItem("geo_access", "prompt");
+            });
+        };
+
+        // Then somewhere
+        ask();
+    });
+    </script>
+    {% endcomment %}
+
+<script>
+    {% if libraries %}
+    {% for library in libraries %}
+        var a = {{ library.get_rating }};
+        document.getElementById("stars-{{ library.id }}").innerHTML = getStars(a);
+    {% endfor %}
+    {% else %}
+        {% for library in other_libraries %}
+        var a = {{ library.get_rating }};
+        document.getElementById("stars-{{ library.id }}").innerHTML = getStars(a);
+    {% endfor %}
+    {% endif %}
 function getStars(rating) {
   // Round to nearest half
   rating = Math.round(rating * 2) / 2;

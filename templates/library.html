@@ -198,7 +198,7 @@
 				<!-- Features -->
 				<h3 class="desc-headline">Amentities</h3>
 				<ul class="property-features checkboxes margin-top-0">
-                    {% for amenity in library.ammenities.all %}
+                    {% for amenity in library.amenities.all %}
 					<li>{{ amenity.title }}</li>
                     {% endfor %}
 				</ul>
@@ -231,46 +231,51 @@
 				</div>
 </div>
 
-
+            {% if library.library_ratings_set.all %}
             <section class="comments">
 			<h4 class="headline margin-bottom-35">Reviews <span class="comments-amount"></span></h4>
 
 				<ul>
+                    {% for review in library.library_ratings_set.all %}
                     <li>
 						<div class="avatar"><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="" /> </div>
 						<div class="comment-content"><div class="arrow-comment"></div>
-							<div class="comment-by">John Doe<span class="date">15th, May 2015 </span>
+							<div class="comment-by">{{ review.user.first_name }}<span class="date">{{ review.date }}</span>
 							</div>
 
                             <b>Rating</b> <span id=stars></span>
-							<p>Very good library. {{ library.location.lat }}{{ library.location }}{{ library.location.x }}</p>
+							<p>{{ review.comment }}</p>
 						</div>
 
 					</li>
+                    {% endfor %}
 				 </ul>
 
 			</section>
+            {% endif %}
 
 
 
-
+                {% if request.user.is_authenticated %}
                 <h3 class="desc-headline">Add Review</h3>
 
-                <form id="add-review" class="add-review">
+                <form method="POST" role="form" id="add-review" class="add-review">
+                    {% csrf_token %}
 				<fieldset>
-
+                    <input type="hidden" name="type" value="rating">
                     <div class="col-md-12">
                         <label>Rating: <span>*</span></label>
 				<div class="rating">
-                    <input id="star5" name="star" type="radio" value="5" class="radio-btn hide" />
+                    {% render_field rating_form.rating id="star5" type="radio" value="5" class="radio-btn hide" %}
+{#                    <input id="star5" name="star" type="radio" value="5" class="radio-btn hide" />#}
                     <label for="star5" >☆</label>
-                    <input id="star4" name="star" type="radio" value="4" class="radio-btn hide" />
+                    {% render_field rating_form.rating id="star4" type="radio" value="4" class="radio-btn hide" %}
                     <label for="star4" >☆</label>
-                    <input id="star3" name="star" type="radio" value="3" class="radio-btn hide" />
+                    {% render_field rating_form.rating id="star3" type="radio" value="3" class="radio-btn hide" %}
                     <label for="star3" >☆</label>
-                    <input id="star2" name="star" type="radio" value="2" class="radio-btn hide" />
+                    {% render_field rating_form.rating id="star2" type="radio" value="2" class="radio-btn hide" %}
                     <label for="star2" >☆</label>
-                    <input id="star1" name="star" type="radio" value="1" class="radio-btn hide" />
+                    {% render_field rating_form.rating id="star1" type="radio" value="1" class="radio-btn hide" %}
                     <label for="star1" >☆</label>
                     <div class="clear"></div>
 
@@ -279,19 +284,22 @@
 
 					<div class="col-md-12">
 						<label>Comment: <span>*</span></label>
-						<textarea cols="40" rows="3"></textarea>
+                        {% render_field rating_form.comment cols="40" rows="3" %}
+{#						<textarea cols="40" rows="3"></textarea>#}
 					</div>
 
 				</fieldset>
 
                     <div class="col-md-12">
-				<a href="#" class="button">Add Review</a>
+				<button class="button fullwidth margin-top-5" type="submit">Add Review</button>
                     </div>
 				<div class="clearfix"></div>
 				<div class="margin-bottom-20"></div>
 
 			</form>
-
+                {% else %}
+                    <h3 style="margin-top: 100px">Please login to review</h3>
+                {% endif %}
 
            </div>
 		</div>
@@ -341,17 +349,17 @@
 
                         <form method="POST" role="form">
                             {% csrf_token %}
-
+                            <input type="hidden" name="type" value="enquiry">
                             {% render_field enquiryform.name  placeholder=enquiryform.name.label %}
                             {{ enquiryform.name.errors }}
 
                             {% render_field enquiryform.email  placeholder=enquiryform.email.label %}
                             {{ enquiryform.email.errors }}
 
-                            {% render_field enquiryform.contact_no  placeholder=enquiryform.contact_no.label %}
+                            {% render_field enquiryform.contact_no  placeholder=enquiryform.contact_no.label pattern='[0-9]{10}' %}
                             {{ enquiryform.contact_no.errors }}
 
-                            {% render_field enquiryform.preferred_joining_date type="date" id="datepicker-12" placeholder=enquiryform.preferred_joining_date.label %}
+                            {% render_field enquiryform.preferred_joining_date  id="datepicker" placeholder=enquiryform.preferred_joining_date.label %}
                             {{ enquiryform.preferred_joining_date.errors }}
 
                             {% render_field enquiryform.preferred_time_slot  placeholder=enquiryform.preferred_time_slot.label %}
@@ -459,6 +467,14 @@ $(function() {
   },
   );
 });
+
+{% comment %}
+$( datefieldid ).datepicker({
+              dateFormat: 'yy-mm-dd',
+              minDate: 0,
+        });
+        {% endcomment %}
+
 </script>
 
 </div>
@@ -476,5 +492,20 @@ $(function() {
 
 
 
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+   <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.js"></script>
 
+<script>
+$('#datepicker').datepicker({
+    showButtonPanel: true,
+    yearRange: "-100:+0",
+    dateFormat: 'yy-mm-dd'
+
+});
+</script>
 {% endblock content %}
